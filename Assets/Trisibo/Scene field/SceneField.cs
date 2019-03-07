@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2018 Trinidad Sibajas Bodoque
+﻿// Copyright (C) 2018-2019 Trinidad Sibajas Bodoque
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -37,12 +37,12 @@ namespace Trisibo
 
 
         #if UNITY_EDITOR
-        [SerializeField] UnityEditor.SceneAsset sceneAsset;
-        [SerializeField] bool logErrorIfNotInBuild;
+        [SerializeField] UnityEditor.SceneAsset sceneAsset = null;
+        [SerializeField] bool logErrorIfNotInBuild = false;
         #endif
 
         #pragma warning disable 414
-        [SerializeField] int buildIndex;
+        [SerializeField] int buildIndex = 0;
         #pragma warning restore 414
 
         
