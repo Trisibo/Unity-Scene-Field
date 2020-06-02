@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2018-2019 Trinidad Sibajas Bodoque
+﻿// Copyright (C) 2017 Trinidad Sibajas Bodoque
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,6 +21,10 @@
 using System;
 using UnityEngine;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 namespace Trisibo
 {
     /// <summary>
@@ -37,7 +41,7 @@ namespace Trisibo
 
 
         #if UNITY_EDITOR
-        [SerializeField] UnityEditor.SceneAsset sceneAsset = null;
+        [SerializeField] SceneAsset sceneAsset = null;
         [SerializeField] bool logErrorIfNotInBuild = false;
         #endif
 
@@ -126,23 +130,38 @@ namespace Trisibo
 
 
         /// <summary>
-        /// Retrieves the build index (editor only).
+        /// ** Editor-only **
+        /// Gets the scene asset, if assigned.
+        /// </summary>
+
+        public SceneAsset EditorSceneAsset => sceneAsset;
+
+
+
+
+
+
+
+
+        /// <summary>
+        /// ** Editor-only **
+        /// Retrieves the build index.
         /// </summary>
         /// <param name="sceneAsset">The scene asset.</param>
         /// <param name="logErrorIfSceneNotInBuild">Log an error if the scene is not in builds.</param>
         /// <returns>The build index, -1 if not found.</returns>
 
-        static int GetBuildIndex(UnityEditor.SceneAsset sceneAsset, bool logErrorIfSceneNotInBuild)
+        static int GetBuildIndex(SceneAsset sceneAsset, bool logErrorIfSceneNotInBuild)
         {
             int buildIndex;
 
             if (sceneAsset != null)
             {
-                string scenePath = UnityEditor.AssetDatabase.GetAssetPath(sceneAsset);
+                string scenePath = AssetDatabase.GetAssetPath(sceneAsset);
 
                 buildIndex = -1;
                 int i = -1;
-                foreach (var scene in UnityEditor.EditorBuildSettings.scenes)
+                foreach (var scene in EditorBuildSettings.scenes)
                 {
                     if (scene.enabled)
                         i++;
