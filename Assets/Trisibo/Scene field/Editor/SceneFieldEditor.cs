@@ -26,12 +26,18 @@ namespace Trisibo
     [CustomPropertyDrawer(typeof(SceneField))]
     public class SceneFieldEditor : PropertyDrawer
     {
-        // Build index parameters:
-        const string buildIndexText = "Index: {0}";
-        const string buildIndexTextNA = "Index: ‒";
-        const string buildIndexTooltip = "Scene build index";
+        // Scene in build data:
+        const float sceneInBuildSeparationLeft  = 1;
+        const float sceneInBuildSeparationRight = 10;
+        const float sceneInBuildSeparationTotal = sceneInBuildSeparationLeft + sceneInBuildSeparationRight;
 
-        GUIStyle buildIndexStyle = EditorStyles.miniLabel;
+        GUIContent sceneInBuildYesContent        = new GUIContent("In build");
+        GUIContent sceneInBuildNoContent         = new GUIContent("Not in build");
+        GUIContent sceneInBuildUnassignedContent = new GUIContent("Unassigned");
+        GUIContent sceneInBuildMultipleContent   = new GUIContent("—");
+
+        GUIStyle _sceneInBuildStyle;
+        GUIStyle SceneInBuildStyle => _sceneInBuildStyle ?? (_sceneInBuildStyle = new GUIStyle(EditorStyles.miniLabel));
         
         float _buildIndexWidth;
         float BuildIndexWidth
@@ -39,38 +45,37 @@ namespace Trisibo
             get
             {
                 if (_buildIndexWidth == 0)
-                {
-                    float min, max;
-                    buildIndexStyle.CalcMinMaxWidth(new GUIContent(string.Format(buildIndexText, 9999)), out min, out max);
-                    _buildIndexWidth = min;
-                }
+                    SceneInBuildStyle.CalcMinMaxWidth(sceneInBuildNoContent, out _buildIndexWidth, out _);
                 
                 return _buildIndexWidth;
             }
         }
 
 
-        // "Throw error if not in build" parameters:
-        GUIContent logErrorContent = new GUIContent("Log err.", "Log error if the scene is not added to builds");
-        GUIStyle logErrorStyleNormal = EditorStyles.miniLabel;
-        GUIStyle logErrorStylePrefabOverride = EditorStyles.miniBoldLabel;
+        // Scene is required data:
+        GUIContent sceneIsRequiredContent = new GUIContent("Required", "Logs an error and fails the build if the scene is not added to builds");
+        
+        GUIStyle _sceneIsRequiredStyleNormal;
+        GUIStyle SceneIsRequiredStyleNormal => _sceneIsRequiredStyleNormal ?? (_sceneIsRequiredStyleNormal = new GUIStyle(EditorStyles.miniLabel));
+        
+        GUIStyle _sceneIsRequiredStylePrefabOverride;
+        GUIStyle SceneIsRequiredStylePrefabOverride => _sceneIsRequiredStylePrefabOverride ?? (_sceneIsRequiredStylePrefabOverride = new GUIStyle(EditorStyles.miniBoldLabel));
 
-        float _logErrorWidth;
-        float LogErrorWidth
+        float _sceneIsRequiredWidth;
+        float SceneIsRequiredWidth
         {
             get
             {
-                if (_logErrorWidth == 0)
+                if (_sceneIsRequiredWidth == 0)
                 {
-                    float min, max;
-                    logErrorStylePrefabOverride.CalcMinMaxWidth(logErrorContent, out min, out max);
-                    _logErrorWidth = min;
+                    SceneIsRequiredStylePrefabOverride.CalcMinMaxWidth(sceneIsRequiredContent, out float min, out _);
+                    _sceneIsRequiredWidth = min;
                     
-                    EditorStyles.toggle.CalcMinMaxWidth(GUIContent.none, out min, out max);
-                    _logErrorWidth += min;
+                    EditorStyles.toggle.CalcMinMaxWidth(GUIContent.none, out min, out _);
+                    _sceneIsRequiredWidth += min;
                 }
 
-                return _logErrorWidth;
+                return _sceneIsRequiredWidth;
             }
         }
 
@@ -87,56 +92,65 @@ namespace Trisibo
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
+            SerializedProperty sceneAssetProp = property.FindPropertyRelative("sceneAsset");
+            SerializedProperty buildIndexProp = property.FindPropertyRelative("buildIndex");
+            SerializedProperty requiredProp   = property.FindPropertyRelative("required");
+
             position.height = EditorGUIUtility.singleLineHeight;
             
             
             // Scene asset:
-            position.width -= BuildIndexWidth + LogErrorWidth;
+            position.width -= BuildIndexWidth + sceneInBuildSeparationTotal + SceneIsRequiredWidth;
             
-            var sceneAssetProp = property.FindPropertyRelative("sceneAsset");
             using (new EditorGUI.PropertyScope(position, label, sceneAssetProp))
             {
                 EditorGUI.PropertyField(position, sceneAssetProp, label);
             }
 
 
-            // Build index:
-            position.x += position.width;
-            position.width = BuildIndexWidth;
-            
-            if (property.hasMultipleDifferentValues)
+            // Is the scene in builds?:
+            position.x += position.width + sceneInBuildSeparationLeft;
+            position.width = BuildIndexWidth + sceneInBuildSeparationRight;
+
+            if (sceneAssetProp.hasMultipleDifferentValues)
             {
-                GUI.Label(position, new GUIContent(buildIndexTextNA, buildIndexTooltip), buildIndexStyle);
+                GUI.Label(position, sceneInBuildMultipleContent, SceneInBuildStyle);
             }
-            else
+            else if (sceneAssetProp.objectReferenceValue != null)
             {
-                int buildIndex = property.FindPropertyRelative("buildIndex").intValue;
+                bool isInBuilds = buildIndexProp.intValue >= 0;
+                
                 Color prevColor = GUI.contentColor;
-                if (sceneAssetProp.objectReferenceValue != null  &&  buildIndex < 0)
+                if (!isInBuilds  &&  requiredProp.boolValue)
                     GUI.contentColor *= Color.red;
             
-                position.width = BuildIndexWidth;
-                GUI.Label(position, new GUIContent(sceneAssetProp.objectReferenceValue != null ? string.Format(buildIndexText, buildIndex) : buildIndexTextNA, buildIndexTooltip), buildIndexStyle);
+                GUI.Label(position, isInBuilds ? sceneInBuildYesContent : sceneInBuildNoContent, SceneInBuildStyle);
 
+                GUI.contentColor = prevColor;
+            }
+            else if (requiredProp.boolValue)
+            {
+                Color prevColor = GUI.contentColor;
+                GUI.contentColor *= Color.red;
+                GUI.Label(position, sceneInBuildUnassignedContent, SceneInBuildStyle);
                 GUI.contentColor = prevColor;
             }
 
 
-            // Log error if not in build?:
+            // Scene required:
             position.x += position.width;
-            position.width = LogErrorWidth;
-            
-            var logErrorIfNotInBuildProp = property.FindPropertyRelative("logErrorIfNotInBuild");
-            using (new EditorGUI.PropertyScope(position, logErrorContent, logErrorIfNotInBuildProp))
+            position.width = SceneIsRequiredWidth;
+
+            using (new EditorGUI.PropertyScope(position, sceneIsRequiredContent, requiredProp))
             using (new EditorGUI.IndentLevelScope(-EditorGUI.indentLevel))
             using (var changeCheck = new EditorGUI.ChangeCheckScope())
             {
-                EditorGUI.showMixedValue = logErrorIfNotInBuildProp.hasMultipleDifferentValues;
-                bool newValue = EditorGUI.ToggleLeft(position, logErrorContent, logErrorIfNotInBuildProp.boolValue, logErrorIfNotInBuildProp.prefabOverride && !logErrorIfNotInBuildProp.hasMultipleDifferentValues  ?  logErrorStylePrefabOverride  :  logErrorStyleNormal);
+                EditorGUI.showMixedValue = requiredProp.hasMultipleDifferentValues;
+                bool newValue = EditorGUI.ToggleLeft(position, sceneIsRequiredContent, requiredProp.boolValue, requiredProp.prefabOverride && !requiredProp.hasMultipleDifferentValues  ?  SceneIsRequiredStylePrefabOverride  :  SceneIsRequiredStyleNormal);
                 EditorGUI.showMixedValue = false;
                 
                 if (changeCheck.changed)
-                    logErrorIfNotInBuildProp.boolValue = newValue;
+                    requiredProp.boolValue = newValue;
             }
         }
     }

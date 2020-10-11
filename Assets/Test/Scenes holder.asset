@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 87cc0ea4d85db2242bbbc17798ca4be1, type: 3}
+  m_Name: Scenes holder
+  m_EditorClassIdentifier: 
+  scenes:
+  - sceneAsset: {fileID: 102900000, guid: 622fdfa2cde8d5b4194ccb689b9765b4, type: 3}
+    required: 1
+    buildIndex: 0
+  - sceneAsset: {fileID: 102900000, guid: 8030b18c88d2b0b48a9848660272d162, type: 3}
+    required: 1
+    buildIndex: 1
+  - sceneAsset: {fileID: 102900000, guid: dba1e6d583b75674fb77f99327c0c62f, type: 3}
+    required: 1
+    buildIndex: 2
+  - sceneAsset: {fileID: 102900000, guid: 8d892ccd3e6ad5f4aa0aa2d3e964b567, type: 3}
+    required: 1
+    buildIndex: 3
+  - sceneAsset: {fileID: 102900000, guid: 164d19ed3d2cdba40a9d3060888d456e, type: 3}
+    required: 1
+    buildIndex: 4
+  - sceneAsset: {fileID: 102900000, guid: 2b963964981403645a90246c89288152, type: 3}
+    required: 1
+    buildIndex: -1
+  - sceneAsset: {fileID: 102900000, guid: 50c29b9fae666054bb926c3f7de927ef, type: 3}
+    required: 1
+    buildIndex: -1
+  - sceneAsset: {fileID: 102900000, guid: 2bb67afe410cc6c47b5c4115ef0d271e, type: 3}
+    required: 1
+    buildIndex: -1
+  - sceneAsset: {fileID: 102900000, guid: 3c0b42cb4943e3c4cabcb66e50a3de52, type: 3}
+    required: 1
+    buildIndex: -1
+  - sceneAsset: {fileID: 102900000, guid: 577c95fca54736245abae303ee4f5206, type: 3}
+    required: 1
+    buildIndex: 5

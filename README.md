@@ -14,8 +14,8 @@ Extension for Unity that allows directly assigning scenes in the Inspector. At r
 There are 3 sections in the inspector:
 
 *   The slot with the scene asset, similar to any other asset selector in Unity.
-*   A text indicating the build index of the scene. If no scene is selected, "-" will appear, and if the scene is not included in builds, the index "-1" will be shown, with the label in red.
-*   A checkbox to enable logging errors in the Unity console if the scene is not included in builds. This is to prevent mistakes, so, when building, the errors will appear in the console if the scene is not going to be added to builds. Unfortunately, in the current version the builds won't be stopped, and when the inspector is visible the log entry will be spammed many times in the console.
+*   A text indicating whether the assigned scene is added to builds. Appears in red if the "Required" checkbox is set.
+*   A checkbox to indicate whether a scene that exists in builds must be assigned. If it isn't, builds will fail, and an error will appear in the editor when trying to get the scene build index.
 
 The inspector correctly supports editing multiple objects, and the standard bold labels when overriding the fields in prefab instances.
 

@@ -32,9 +32,5 @@ sysinfo.txt
 /[Bb]uild/
 /[Bb]uilds/
 
-#Test
-/[Aa]ssets/[Tt]est/
-/[Aa]ssets/[Tt]est.meta
-
 # Other
 *.docx#
